@@ -1,6 +1,4 @@
 
-
-```markdown
 # Hotel Recommendation System
 
 ## Overview
@@ -76,5 +74,5 @@ streamlit run [your_app_file.py]
 - Integrate a geolocation API for real-time attraction data.
 
 
-```
+
 
