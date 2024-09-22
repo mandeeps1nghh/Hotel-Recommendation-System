@@ -2,68 +2,8 @@ import streamlit as st
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import os
+from attractions import get_attractions_for_hotel
 
-# Initialize session state
-if 'user' not in st.session_state:
-    st.session_state['user'] = None
-
-# Custom CSS for styling
-def apply_css():
-    st.markdown(
-        """
-        <style>
-        /* Set the background color for the entire app */
-        .reportview-container {
-            background: #f0f0f5;  /* Light gray background */
-        }
-        
-        /* Style the sidebar */
-        .sidebar .sidebar-content {
-            background: #ffffff;  /* White background for sidebar */
-            border-radius: 10px;  /* Rounded corners */
-            padding: 10px;  /* Padding inside the sidebar */
-        }
-        
-        /* Style headers */
-        h2 {
-            color: #333333;  /* Dark gray color for headers */
-        }
-        
-        /* Style buttons */
-        .stButton > button {
-            background-color: #4CAF50;  /* Green background for buttons */
-            color: white;  /* White text color */
-            border: none;  /* Remove border */
-            border-radius: 5px;  /* Rounded corners */
-            padding: 10px 20px;  /* Padding inside the button */
-            cursor: pointer;  /* Pointer cursor on hover */
-        }
-        
-        /* Change button color on hover */
-        .stButton > button:hover {
-            background-color: #45a049;  /* Darker green on hover */
-        }
-        
-        /* Style the dataframe */
-        .dataframe {
-            border-collapse: collapse;  /* Collapse borders */
-            width: 100%;  /* Full width */
-        }
-        
-        .dataframe th, .dataframe td {
-            border: 1px solid #dddddd;  /* Light gray border */
-            text-align: left;  /* Left align text */
-            padding: 8px;  /* Padding inside cells */
-        }
-        
-        .dataframe th {
-            background-color: #f2f2f2;  /* Light gray background for headers */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
 
 def clean_text(text):
     return str(text).lower().strip()
@@ -75,31 +15,35 @@ def get_recommendations(hotel_name, df, hotel_vectors, feature='Rating'):
     similar_indices = cosine_similarities.argsort()[0][::-1]
     similar_indices = similar_indices[similar_indices != hotel_index]
     similar_hotels = df.iloc[similar_indices].copy()
-    
+
     selected_city = df.loc[hotel_index, 'Place']
     similar_hotels = similar_hotels[similar_hotels['Place'] == selected_city]
-    
+
     if feature == 'Total Reviews':
         similar_hotels['Total Reviews'] = similar_hotels['Total Reviews'].str.replace(',', '').str.split().str[0].astype(float)
-    
+
     return similar_hotels.sort_values(by=feature, ascending=False).head(min(10, len(similar_hotels)))
 
 def main_app():
-    apply_css()  # Apply CSS styles
-
-    # Use Streamlit's title function
     st.title("Hotel Recommendation System")
     st.header("Find Your Perfect Hotel")
 
-    df = pd.read_csv(r'C:\Users\jasre\Downloads\kafkaa\pro\hotel_details.csv')
+    # Load the CSV file
+    df = pd.read_csv(r'C:\Users\jasre\Downloads\kafkaa\pro\output.csv')
+    
+    # Clean and prepare the DataFrame
     df['clean_name'] = df['Hotel Name'].apply(clean_text)
-    df['clean_description'] = df['description'].apply(clean_text)
+    df['clean_description'] = df['description'].fillna('').apply(clean_text)
     df['Rating'] = pd.to_numeric(df['Rating'], errors='coerce')
-    df['Condition'] = df['Condition'].astype(str)
+
+    # Handle missing lat/lng values
+    df['lat'].fillna(0, inplace=True)  # Fill missing lat values with 0
+    df['lng'].fillna(0, inplace=True)  # Fill missing lng values with 0
 
     places = sorted(df['Place'].astype(str).unique())
     selected_place = st.sidebar.selectbox("Filter by place", ['All'] + list(places))
 
+    # Use 'Condition' for filtering
     conditions = sorted(df['Condition'].astype(str).unique())
     selected_condition = st.sidebar.selectbox("Filter by condition", ['All'] + list(conditions))
 
@@ -113,7 +57,6 @@ def main_app():
 
     vectorizer = TfidfVectorizer(analyzer='word', lowercase=False, stop_words='english')
     text_for_vectorization = filtered_df['clean_name'].fillna('') + ' ' + filtered_df['clean_description'].fillna('')
-    text_for_vectorization = text_for_vectorization.replace('', 'no_description')
 
     try:
         X = vectorizer.fit_transform(text_for_vectorization)
@@ -133,6 +76,13 @@ def main_app():
                 else:
                     st.warning("Please select a hotel.")
 
+        # Button to show nearby attractions
+        if st.button('Show Nearby Attractions'):
+            hotel_data = filtered_df[filtered_df['Hotel Name'] == hotel]
+            if not hotel_data.empty:
+                attractions_df = get_attractions_for_hotel(hotel_data.iloc[0])
+                st.dataframe(attractions_df)
+
         st.sidebar.metric("Total Hotels", len(filtered_df))
         average_rating = filtered_df['Rating'].mean()
         st.sidebar.metric("Average Rating", f"{average_rating:.2f}")
@@ -141,8 +91,9 @@ def main_app():
         st.error(f"An error occurred: {str(e)}")
         st.warning("No valid text found for creating recommendations. Please try different filter options.")
 
+
 def app():
-    main_app()  # Directly call main_app
+    main_app()
 
 if __name__ == "__main__":
     main_app()
