@@ -1,78 +1,83 @@
-
 # Hotel Recommendation System
 
 ## Overview
-This project aims to build a hotel recommendation system using Python and various libraries such as Pandas, Streamlit, and Scikit-learn. The system utilizes hotel data along with city information to provide recommendations based on user preferences.
-
-## Project Structure
-- **Datasets**:
-  - **Hotel Data**: Contains information about hotels including names, locations, ratings, and reviews.
-  - **City Data**: Contains geographical information about cities, including latitude and longitude.
-
-## Data Sources
-- Hotel Data: [Source of your hotel data, e.g., a CSV file or API]
-- City Data: [Source of your city data, e.g., a CSV file or API]
+The Hotel Recommendation System is a web application built using Python and Streamlit that helps users find hotels based on their preferences. The application utilizes machine learning techniques to recommend similar hotels based on user-selected options and displays nearby attractions.
 
 ## Features
-1. **Hotel Recommendation**: Users can receive hotel suggestions based on their preferences.
-2. **Nearby Attractions**: Future enhancements will include recommendations for nearby attractions based on the hotel location.
-3. **Hotel Comparison**: Users will be able to compare different hotels based on ratings and reviews.
+- **Hotel Filtering**: Users can filter hotels by place and condition.
+- **Recommendations**: Get hotel recommendations based on user-selected hotels.
+- **Nearby Attractions**: View nearby attractions based on the selected hotel location.
+- **User-Friendly Interface**: Built with Streamlit for an interactive web application experience.
 
-## Data Processing
-The merging of hotel and city datasets is performed based on the last word of the "Place" column in the hotel data. The process is implemented using Pandas.
-
-### Steps to Merge Datasets
-1. **Extract the Last Word**: The last word from the "Place" column in the hotel dataset is extracted to identify the corresponding city.
-2. **Merge the Datasets**: The hotel dataset is merged with the city dataset on the extracted city names.
-
-### Sample Code
-The following code snippet illustrates the merging process:
-
-```python
-import pandas as pd
-
-# Load hotel and city data into DataFrames
-hotel_df = pd.read_csv('hotel_data.csv')
-city_df = pd.read_csv('city_data.csv')
-
-# Extract last word from the Place column
-hotel_df['City'] = hotel_df['Place'].str.split().str[-1]
-
-# Merge the DataFrames
-merged_df = hotel_df.merge(city_df, how='left', left_on='City', right_on='city')
-
-# Select relevant columns for final output
-final_df = merged_df[['Hotel Name', 'Place', 'Description', 'Condition', 'Rating', 'Total Reviews', 'lat', 'lng']]
-```
-
-## Requirements
-- Python 3.x
-- Pandas
-- Streamlit
-- Scikit-learn
+## Technologies Used
+- **Python**: The programming language used for the application.
+- **Pandas**: For data manipulation and analysis.
+- **Requests**: For making HTTP requests to fetch data from APIs.
+- **Scikit-learn**: For machine learning functionalities, including text vectorization and similarity calculations.
+- **Streamlit**: For building the web application interface.
 
 ## Installation
+
 1. Clone the repository:
-   ```
-   git clone [repository-url]
-   cd [repository-directory]
-   ```
-2. Install the required packages:
-   ```
-   pip install pandas streamlit scikit-learn
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
    ```
 
-## Running the Application
-To run the hotel recommendation system, use the following command:
-```
-streamlit run [your_app_file.py]
-```
+2. Create a virtual environment (optional but recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
 
-## Future Enhancements
-- Implement a user interface for input preferences.
-- Add functionality for user reviews and ratings.
-- Integrate a geolocation API for real-time attraction data.
+3. Install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Dataset
+The application uses a CSV file named `output.csv` that contains hotel information with the following columns:
+- `Hotel Name`
+- `Place`
+- `description`
+- `Condition`
+- `Rating`
+- `Total Reviews`
+- `lat`
+- `lng`
+
+## Usage
+
+1. Ensure you have the required CSV file (`output.csv`) in the project directory.
+2. Run the Streamlit application:
+   ```bash
+   streamlit run app.py
+   ```
+3. Open your web browser and go to `http://localhost:8501` to access the application.
+
+## Code Structure
+- **app.py**: The main application file that handles user interactions and displays hotel recommendations.
+- **recommendations.py**: Contains functions for cleaning text and generating hotel recommendations based on user input.
+- **attractions.py**: Fetches nearby attractions based on the selected hotel's latitude and longitude.
+
+## Contributing
+We welcome contributions to this project! If you have suggestions for improvements, new features, or bug fixes, please feel free to open an issue or submit a pull request. 
+
+### How to Contribute
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them.
+4. Push your changes to your forked repository.
+5. Submit a pull request detailing your changes.
+
+Your contributions help make this project better for everyone!
 
 
+````
 
+### Instructions for Use
+1. **Create a new file** named `README.md` in your project directory.
+2. **Copy and paste** the above content into the file.
+3. **Modify** any sections as necessary to fit your specific project details, such as the repository URL and any additional features or acknowledgments.
 
+This updated `README.md` now includes a welcoming message for contributions and clear instructions on how to contribute to the project, making it more inviting for potential collaborators.
