@@ -80,4 +80,3 @@ Your contributions help make this project better for everyone!
 2. **Copy and paste** the above content into the file.
 3. **Modify** any sections as necessary to fit your specific project details, such as the repository URL and any additional features or acknowledgments.
 
-This updated `README.md` now includes a welcoming message for contributions and clear instructions on how to contribute to the project, making it more inviting for potential collaborators.
